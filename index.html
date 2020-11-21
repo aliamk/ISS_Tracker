@@ -4,7 +4,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Leaflet's CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+    <!-- <link rel="stylesheet" href="style.css"> -->
+
     <title>Document</title>
+
+    <style>
+        body {
+            margin: 1em;
+            text-align: center;
+            background-color: whitesmoke;
+        }
+
+        #issMap {
+            height: 180px;
+        }
+    </style>
 </head>
 
 <body>
@@ -12,8 +34,28 @@
 
     <p>Latitude: <span id="lat"></span><br />Longitude: <span id="lon"></span></p>
 
+    <div id="issMap"></div>
 
     <script>
+        // Leaflet.js map
+        const mymap = L.map('issMap').setView([0, 0], 1);
+
+        var myIcon = L.icon({
+            iconUrl: 'iss200.png',
+            iconSize: [50, 32],
+            iconAnchor: [25, 16]
+        });
+
+
+        // Leaflet.js marker: starts at position 0
+        const marker = L.marker([0, 0]).addTo(mymap)
+
+        // Required to use openstreetmap's map tiles
+        const attribution =
+            'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>';
+        const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        const tiles = L.tileLayer(tileUrl, { attribution });
+        tiles.addTo(mymap); // Can see the map on the page now
 
         const api_url = 'https://api.wheretheiss.at/v1/satellites/25544'
         async function getISS() {
@@ -24,6 +66,10 @@
             console.log('longitude:', data.longitude)
             console.log('latitude:', data.latitude)
 
+            // Updates position of the marker from 0 to data from the api
+            marker.setLatLng([latitude, longitude]);
+
+            // Insert the values of the api data into the page
             document.getElementById('lat').textContent = latitude
             document.getElementById('lon').textContent = longitude
         }
